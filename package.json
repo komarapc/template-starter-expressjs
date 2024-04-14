@@ -9,6 +9,9 @@
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register index.ts",
     "build": "rm -rf ./dist && tsc -p . && tspath -f"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "@prisma/client": "^5.12.1",
