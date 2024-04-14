@@ -1,33 +1,40 @@
 import { usersMockup, UserType } from "@/data/usersMockup";
+import { PrismaClient } from "@prisma/client";
 
 class UserRepo {
+  private readonly prisma: PrismaClient = new PrismaClient();
   async findAll() {
-    return usersMockup;
+    const data = await this.prisma.users.findMany();
+    return data;
   }
   async findById(id: string) {
-    return usersMockup.find((item) => item.id === id);
+    const data = await this.prisma.users.findUnique({ where: { id } });
+    return data;
   }
   async findByEmail(email: string) {
-    return usersMockup.find(
-      (item) => item.email.toLowerCase() === email.toLowerCase()
-    );
+    const data = await this.prisma.users.findUnique({ where: { email } });
+    return data;
   }
   async store(user: UserType) {
     user.id = crypto.randomUUID();
-    usersMockup.push(user);
-    return user;
+    const data = await this.prisma.users.create({ data: user });
+    return data;
   }
   async update(id: string, data: UserType) {
-    const user = usersMockup.find((item) => item.id === id);
-    if (!user) return false;
-    Object.assign(user, data);
-    return user;
+    if (!(await this.findById(id))) return false;
+    const update = await this.prisma.users.update({
+      where: { id },
+      data,
+    });
+    return update;
   }
   async delete(id: string) {
-    const index = usersMockup.findIndex((item) => item.id === id);
-    if (index === -1) return false;
-    usersMockup.splice(index, 1);
-    return true;
+    if (!(await this.findById(id))) return false;
+    const data = await this.prisma.users.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+    return data;
   }
 }
 
