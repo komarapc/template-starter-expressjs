@@ -1,34 +1,39 @@
 import { Roles, rolesMockup } from "@/data/rolesMockup";
+import { PrismaClient } from "@prisma/client";
 
 class RoleRepo {
+  private readonly prisma: PrismaClient = new PrismaClient();
   async findAll() {
     return rolesMockup;
   }
   async findByName(name: string) {
-    return rolesMockup.find(
-      (item) => item.roleName.toLowerCase() === name.toLowerCase()
-    );
+    const data = await this.prisma.roles.findUnique({
+      where: { role_name: name },
+    });
+    return data;
   }
   async findById(id: string) {
-    return rolesMockup.find((item) => item.id === id);
+    const data = await this.prisma.roles.findUnique({ where: { id } });
+    return data;
   }
   async store(role: Roles) {
     role.id = crypto.randomUUID();
-    role.createdAt = new Date();
-    rolesMockup.push(role);
-    return role;
+    const data = await this.prisma.roles.create({ data: role });
+    return data;
   }
-  async update(data: Roles) {
-    const role = rolesMockup.find((item) => item.id === data.id);
-    if (!role) return false;
-    Object.assign(role, data);
-    return role;
+  async update(role: Roles) {
+    const data = await this.prisma.roles.update({
+      where: { id: role.id },
+      data: role,
+    });
+    return data;
   }
   async delete(id: string) {
-    const index = rolesMockup.findIndex((item) => item.id === id);
-    if (index === -1) return false;
-    rolesMockup.splice(index, 1);
-    return true;
+    const data = await this.prisma.roles.update({
+      where: { id },
+      data: { deleted_at: new Date() },
+    });
+    return data;
   }
 }
 
