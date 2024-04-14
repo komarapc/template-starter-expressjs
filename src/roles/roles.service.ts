@@ -32,7 +32,7 @@ class RoleService {
     try {
       if (!Object.keys(role).length) return responseError({ code: 400 });
       const errors = validateRole(role);
-      const roleExist = await this.roleRepo.findByName(role.roleName);
+      const roleExist = await this.roleRepo.findByName(role.role_name);
       if (roleExist)
         return responseError({ code: 409, message: "Already exist" });
       if (errors.length) return responseError({ code: 400, message: errors });
@@ -50,7 +50,7 @@ class RoleService {
       if (errors.length) return responseError({ code: 400, message: errors });
       const [existRole, existName] = await Promise.all([
         await this.roleRepo.findById(id),
-        await this.roleRepo.findByName(data.roleName),
+        await this.roleRepo.findByName(data.role_name),
       ]);
       if (!existRole) return responseError({ code: 404 });
       if (existName)

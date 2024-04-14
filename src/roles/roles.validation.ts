@@ -3,8 +3,8 @@ import { ErrorMessage } from "@/lib/utils";
 
 const validateRole = (role: Roles) => {
   const errors: ErrorMessage<Roles>[] = [];
-  if (!role.roleName || !role.roleName.trim())
-    errors.push({ key: "roleName", message: "Required" });
+  if (!role.role_name || !role.role_name.trim())
+    errors.push({ key: "role_name", message: "Required" });
   return errors;
 };
 
