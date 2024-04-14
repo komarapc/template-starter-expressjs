@@ -1,6 +1,7 @@
 import { responseError, responseSuccess } from "@/lib/utils";
 import UserRepo from "./users.repo";
 import { UserType } from "@/data/usersMockup";
+import { validateUser } from "./users.validation";
 
 class UserService {
   private readonly userRepo: UserRepo = new UserRepo();
@@ -26,6 +27,8 @@ class UserService {
 
   async store(user: UserType) {
     try {
+      const errors = validateUser(user);
+      if (errors.length) return responseError({ code: 400, message: errors });
       const userExist = await this.userRepo.findById(user.email);
       if (userExist) return responseError({ code: 409 });
       const storeUser = await this.userRepo.store(user);
@@ -37,6 +40,8 @@ class UserService {
 
   async update(id: string, user: UserType) {
     try {
+      const errors = validateUser(user);
+      if (errors.length) return responseError({ code: 400, message: errors });
       if (id !== user.id) return responseError({ code: 403 });
       const userExist = await this.userRepo.findById(user.id);
       if (!userExist) return responseError({ code: 404 });

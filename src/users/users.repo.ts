@@ -1,10 +1,20 @@
-import { usersMockup, UserType } from "@/data/usersMockup";
+import { UserType } from "@/data/usersMockup";
 import { PrismaClient } from "@prisma/client";
 
 class UserRepo {
   private readonly prisma: PrismaClient = new PrismaClient();
   async findAll() {
-    const data = await this.prisma.users.findMany();
+    const data = await this.prisma.users.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: { select: { id: true, role_name: true } },
+      },
+      where: {
+        deleted_at: null,
+      },
+    });
     return data;
   }
   async findById(id: string) {
