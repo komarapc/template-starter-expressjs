@@ -39,7 +39,7 @@ model Users {
 model Tokens {
   id         String    @id
   user_id    String    @unique
-  token      String
+  token      String    @db.Text
   created_at DateTime  @default(now())
   updated_at DateTime  @default(now())
   deleted_at DateTime?
