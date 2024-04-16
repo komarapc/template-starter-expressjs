@@ -5,5 +5,5 @@ const controller = new TokenController();
 router.get("/", controller.index);
 router.get("/:id", controller.show);
 router.post("/", controller.store);
-router.delete("/", controller.delete);
+router.delete("/:id", controller.delete);
 export default router;
