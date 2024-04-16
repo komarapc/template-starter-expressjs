@@ -25,7 +25,7 @@ class TokenRepo {
     const token = await this.prisma.tokens.upsert({
       where: { user_id: data.user_id },
       update: data,
-      create: data,
+      create: { ...data, id: crypto.randomUUID() },
     });
     return data;
   }

@@ -4,7 +4,10 @@ import { PrismaClient } from "@prisma/client";
 class RoleRepo {
   private readonly prisma: PrismaClient = new PrismaClient();
   async findAll() {
-    return rolesMockup;
+    return await this.prisma.roles.findMany({
+      where: { deleted_at: null },
+      orderBy: { role_name: "asc" },
+    });
   }
   async findByName(name: string) {
     const data = await this.prisma.roles.findUnique({
