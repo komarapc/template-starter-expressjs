@@ -1,3 +1,5 @@
+import { DEBUG } from "@/config/app";
+
 export type ResponseData<T, E> = {
   statusCode: number;
   statusMessage: string;
@@ -55,8 +57,15 @@ export const responseError = <T, E>(
   success: false,
 });
 
+export const stringToBoolean = (value: string) => {
+  return value === "true";
+};
+
 export const randomNumbers = (min: number, max: number): number => {
   const random = Math.floor(Math.random() * max);
   if (random >= min && random <= max) return random;
   return randomNumbers(min, max);
+};
+export const debugError = (error: any) => {
+  DEBUG ? console.log({ error }) : null;
 };
