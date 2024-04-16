@@ -59,12 +59,8 @@ class TokenService {
     try {
       const token = await this.tokenRepo.findById(id);
       if (!token) return responseError({ code: 404 });
-      const deleteToken = await this.tokenRepo.delete(id);
-      return responseSuccess({
-        code: 200,
-        message: "Deleted",
-        data: deleteToken,
-      });
+      await this.tokenRepo.delete(id);
+      return responseSuccess({ code: 200, message: "Deleted" });
     } catch (error) {
       return responseError({ code: 500 });
     }
