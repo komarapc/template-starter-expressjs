@@ -1,5 +1,6 @@
 import { DEBUG } from "@/config/app";
-
+import * as crypto from "crypto";
+import * as nanoid from "nanoid";
 export type ResponseData<T, E> = {
   statusCode: number;
   statusMessage: string;
@@ -23,7 +24,7 @@ export const HTTP_STATUS_CODE = {
 };
 export type STATUS_CODE_TYPE = keyof typeof HTTP_STATUS_CODE;
 export type ErrorMessage<T> = {
-  key: keyof T;
+  field: keyof T;
   message: string;
 };
 
@@ -68,4 +69,21 @@ export const randomNumbers = (min: number, max: number): number => {
 };
 export const debugError = (error: any) => {
   DEBUG ? console.log({ error }) : null;
+};
+export const generateHash = (): string => {
+  return crypto.createHash("sha256").update(crypto.randomUUID()).digest("hex");
+};
+
+export const excludeFields = <T>(obj: T, fields: Array<keyof T>) => {
+  const newObj = { ...obj };
+  for (const field of fields) {
+    delete newObj[field];
+  }
+  return newObj;
+};
+
+const alphabets =
+  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+export const generateId = (length = 21): string => {
+  return nanoid.customAlphabet(alphabets, length)();
 };
