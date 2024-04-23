@@ -1,5 +1,5 @@
 import { SALT_ROUNDS } from "../config/app";
-import { randomNumbers } from "./../lib/utils";
+import { generateId, randomNumbers } from "../lib/utils";
 import { PrismaClient } from "@prisma/client";
 import { Roles } from "../data/rolesMockup";
 import { UserType } from "../data/usersMockup";
@@ -14,7 +14,7 @@ roles.push({ role_name: "Administrator" });
 const uniqueRoles = new Set(roles.map((item) => item.role_name));
 const rolesMockup: Roles[] = Array.from(uniqueRoles)
   .map((item) => ({
-    id: crypto.randomUUID(),
+    id: generateId(),
     role_name: item,
     created_at: faker.date.past(),
     updated_at: faker.date.recent(),
@@ -24,7 +24,7 @@ const rolesMockup: Roles[] = Array.from(uniqueRoles)
   );
 
 const usersMockup: UserType[] = Array.from({ length: 100 }, () => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   name: faker.person.fullName(),
   email: faker.internet.email(),
   password: bcrypt.hashSync("password", SALT_ROUNDS),
