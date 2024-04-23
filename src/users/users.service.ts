@@ -1,14 +1,16 @@
-import { responseError, responseSuccess } from "@/lib/utils";
+import { excludeFields, responseError, responseSuccess } from "@/lib/utils";
 import UserRepo from "./users.repo";
 import { UserType } from "@/data/usersMockup";
 import { validateUser } from "./users.validation";
+import BearerMiddlewaree from "@/middleware/bearer.middleware";
 
 class UserService {
   private readonly userRepo: UserRepo = new UserRepo();
-
+  private readonly bearer: BearerMiddlewaree = new BearerMiddlewaree();
   async findAll() {
     try {
       const users = await this.userRepo.findAll();
+      console.log("token", await this.bearer.getToken());
       return responseSuccess({ code: 200, data: { users } });
     } catch (error) {
       return responseError({ code: 500 });
@@ -19,7 +21,8 @@ class UserService {
     try {
       const user = await this.userRepo.findById(id);
       if (!user) return responseError({ code: 404 });
-      return responseSuccess({ code: 200, data: user });
+      const exludedUser = excludeFields(user, ["password"]);
+      return responseSuccess({ code: 200, data: exludedUser });
     } catch (error) {
       return responseError({ code: 500 });
     }
@@ -29,7 +32,12 @@ class UserService {
     try {
       const errors = validateUser(user);
       if (errors.length) return responseError({ code: 400, message: errors });
-      const userExist = await this.userRepo.findById(user.email);
+      const [userExist, roleExist] = await Promise.all([
+        this.userRepo.findById(user.email),
+        this.userRepo.findById(user.role_id),
+      ]);
+      if (!roleExist)
+        return responseError({ code: 404, message: "Role not found" });
       if (userExist) return responseError({ code: 409 });
       const storeUser = await this.userRepo.store(user);
       return responseSuccess({ code: 201, data: storeUser });

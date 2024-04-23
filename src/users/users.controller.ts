@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 import UserService from "./users.service";
 import { UserType } from "@/data/usersMockup";
+import { CustomRequest } from "@/lib/utils";
 
 const service = new UserService();
 
-const indexHandler = async (req: Request, res: Response) => {
+const indexHandler = async (req: CustomRequest, res: Response) => {
+  const { token } = req;
+  console.log({ token });
   const result = await service.findAll();
   res.status(result.statusCode).json(result);
 };

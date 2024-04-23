@@ -5,6 +5,10 @@ import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "@/config/app";
 import * as crypto from "crypto";
 import UserRepo from "../users/users.repo";
+export type TokenPayloads = {
+  key: string;
+  user_id: string;
+};
 class TokenService {
   private readonly tokenRepo: TokenRepo = new TokenRepo();
   private readonly userRepo: UserRepo = new UserRepo();
@@ -41,12 +45,13 @@ class TokenService {
         .createHash("sha256")
         .update(crypto.randomUUID())
         .digest("hex");
-      const jwtToken = this.generateToken({
+      const jwtToken = await this.generateToken({
         key: hash,
         user_id: token.user_id,
       });
       if (!jwtToken)
         return responseError({ code: 500, message: "Can not create token" });
+      token.id = crypto.randomUUID();
       token.token = jwtToken;
       const storeToken = await this.tokenRepo.store(token);
       return responseSuccess({ code: 201, data: storeToken });
@@ -65,14 +70,9 @@ class TokenService {
       return responseError({ code: 500 });
     }
   }
-  private generateToken(payload: any) {
-    try {
-      if (!payload || !SECRET_KEY) return false;
-      const token = jwt.sign(JSON.stringify(payload), SECRET_KEY!);
-      return token;
-    } catch (error) {
-      return false;
-    }
+  async generateToken(payload: TokenPayloads, options?: jwt.SignOptions) {
+    const token = jwt.sign(payload, SECRET_KEY!, options);
+    return token;
   }
 }
 

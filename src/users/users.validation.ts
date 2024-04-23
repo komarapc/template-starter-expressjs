@@ -1,13 +1,22 @@
 import { UserType } from "@/data/usersMockup";
 import { ErrorMessage } from "@/lib/utils";
-
+import { z } from "zod";
+const FormSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  name: z.string(),
+  role_id: z.string(),
+});
 export const validateUser = (user: UserType) => {
   const errors: ErrorMessage<UserType>[] = [];
-  if (!user.email) errors.push({ key: "email", message: "Email is required" });
-  if (!user.password)
-    errors.push({ key: "password", message: "Password is required" });
-  if (!user.name) errors.push({ key: "name", message: "Name is required" });
-  if (!user.role_id)
-    errors.push({ key: "role_id", message: "Role is required" });
+  const result = FormSchema.safeParse(user);
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      errors.push({
+        field: issue.path[0] as keyof UserType,
+        message: issue.message,
+      });
+    }
+  }
   return errors;
 };

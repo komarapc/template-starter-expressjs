@@ -1,5 +1,6 @@
 import { DEBUG } from "@/config/app";
 import * as crypto from "crypto";
+import { Request } from "express";
 import * as nanoid from "nanoid";
 export type ResponseData<T, E> = {
   statusCode: number;
@@ -8,6 +9,10 @@ export type ResponseData<T, E> = {
   message?: string | string[] | E;
   data?: T;
 };
+
+export interface CustomRequest extends Request {
+  token?: string;
+}
 
 export const HTTP_STATUS_CODE = {
   200: "OK",
@@ -69,6 +74,9 @@ export const randomNumbers = (min: number, max: number): number => {
 };
 export const debugError = (error: any) => {
   DEBUG ? console.log({ error }) : null;
+};
+export const debugConsole = (data: any) => {
+  DEBUG ? console.log(data) : null;
 };
 export const generateHash = (): string => {
   return crypto.createHash("sha256").update(crypto.randomUUID()).digest("hex");

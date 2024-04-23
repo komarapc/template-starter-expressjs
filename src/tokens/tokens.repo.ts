@@ -3,8 +3,8 @@ export type Tokens = {
   id: string;
   user_id: string;
   token: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
   deleted_at?: Date;
 };
 class TokenRepo {
@@ -21,11 +21,16 @@ class TokenRepo {
     return data;
   }
 
+  async findByUserId(user_id: string) {
+    const data = await this.prisma.tokens.findUnique({ where: { user_id } });
+    return data;
+  }
+
   async store(data: Tokens) {
     const token = await this.prisma.tokens.upsert({
       where: { user_id: data.user_id },
       update: data,
-      create: { ...data, id: crypto.randomUUID() },
+      create: data,
     });
     return data;
   }
